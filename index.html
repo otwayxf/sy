@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sy</title>
+    <style>
+        #output {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            overflow: hidden;
+        }
+		
+		#screenshotData {
+			width: 100vw;
+			height: auto;
+			word-wrap:break-word;
+			word-break:break-all;
+		}
+
+    </style>
+</head>
+<body>
+    <form>
+            <label for="font">字体：</label>
+            <select id="font" name="font">
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+            </select>
+            <br>
+            <label for="fontSize">字体大小：</label>
+            <select id="fontSize" name="fontSize">
+                <option value="12px">12px</option>
+                <option value="16px">16px</option>
+                <option value="20px">20px</option>
+            </select>
+            <br>
+            <label for="lineHeight">行间距：</label>
+            <select id="lineHeight" name="lineHeight">
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+            </select>
+            <br>
+            <label>首行缩进：</label>
+            <input type="radio" name="indent" value="true">是
+            <input type="radio" name="indent" value="false" checked>否
+            <br>
+            <label for="width">文本框宽度：</label>
+            <input type="text" id="width" name="width" value="300">
+            <br>
+            <label for="height">文本框高度：</label>
+            <input type="text" id="height" name="height" value="150">
+            <br>
+            <label for="textContent">文本框文案：</label>
+            <textarea id="textContent" name="textContent">这里是文本框的内容。</textarea>
+            <br>
+            <button type="button" id="detectButton">检测并下载</button>
+        </form>
+
+    <div id="output"></div>
+	
+	<!-- 用于显示截图的img元素 -->
+		<div id="result"></div>
+		<span>截图：</span>
+	    <img id="screenshot" alt="截图">
+		<br>
+		<div id="screenshotData"></div>
+	
+		<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script>
+		const screenshotData = document.getElementById("screenshotData")
+        document.getElementById("detectButton").addEventListener("click", function () {
+            const font = document.getElementById("font").value;
+            const fontSize = document.getElementById("fontSize").value;
+            const lineHeight = document.getElementById("lineHeight").value;
+            const indent = document.querySelector('input[name="indent"]:checked').value;
+            const width = document.getElementById("width").value;
+            const height = document.getElementById("height").value;
+            const textContent = document.getElementById("textContent").value;
+
+            const output = document.getElementById("output");
+            output.style.fontFamily = font;
+            output.style.fontSize = fontSize;
+            output.style.lineHeight = lineHeight;
+            output.style.textIndent = indent === "true" ? "2em" : "0";
+            output.style.width = width + "px";
+            output.style.height = height + "px";
+            output.textContent = textContent;
+
+
+			// 使用html2canvas将DOM截图转换为图像
+            html2canvas(output).then(function (canvas) {
+				
+				// 将截图保存为Base64数据
+				                const base64Data = canvas.toDataURL("image/png");
+				
+				                // 显示截图并设置img元素的src属性
+				                const screenshot = document.getElementById("screenshot");
+				                screenshot.style.display = "block";
+				                screenshot.src = base64Data;
+								screenshotData.innerText = base64Data
+
+								
+								
+                // 将截图保存为Blob对象
+                // canvas.toBlob(function (blob) {
+                //     // 使用FileSaver.js保存Blob为文件
+                //     saveAs(blob, "text_box_screenshot.png");
+                // });
+            });
+			
+            // 检测文本是否溢出
+			const result = document.getElementById("result");
+            if (output.scrollWidth > output.clientWidth || output.scrollHeight > output.clientHeight) {
+               result.innerText = '文本溢出'
+            } else {
+				result.innerText = '文本未溢出'
+            }
+        });
+    </script>
+</body>
+</html>
